@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>React Native Certification — Study & Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js"></script>
+<style>
+:root {
+  --bg: #070b14;
+  --bg2: #0d1220;
+  --bg3: #131926;
+  --surface: #161d2e;
+  --surface2: #1c2540;
+  --border: rgba(56,189,248,0.12);
+  --border2: rgba(56,189,248,0.28);
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --accent3: #34d399;
+  --accent4: #fb923c;
+  --rn-blue: #61dafb;
+  --text: #e2e8f5;
+  --text2: #8899b4;
+  --text3: #44556a;
+  --correct: #34d399;
+  --wrong: #f87171;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui: 'DM Sans', sans-serif;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --glow-accent: 0 0 32px rgba(56,189,248,0.25);
+  --glow-correct: 0 0 28px rgba(52,211,153,0.35);
+  --glow-wrong: 0 0 28px rgba(248,113,113,0.35);
+}
+[data-theme="light"] {
+  --bg: #f0f4ff;
+  --bg2: #e8eeff;
+  --bg3: #dde4f8;
+  --surface: #ffffff;
+  --surface2: #f4f6ff;
+  --border: rgba(56,120,200,0.15);
+  --border2: rgba(56,120,200,0.3);
+  --text: #1a2040;
+  --text2: #4a5878;
+  --text3: #8a9ab8;
+  --glow-accent: 0 4px 20px rgba(56,189,248,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:flex;flex-direction:column;transition:background 0.4s,color 0.4s;}
+
+/* CANVAS */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.6;}
+
+/* TOPBAR */
+.topbar{position:relative;z-index:100;display:flex;align-items:center;gap:16px;padding:12px 24px;background:rgba(7,11,20,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+[data-theme="light"] .topbar{background:rgba(240,244,255,0.92);}
+.topbar-logo{font-family:var(--font-display);font-weight:900;font-size:18px;background:linear-gradient(135deg,var(--rn-blue),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--rn-blue),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;-webkit-text-fill-color:white;}
+.topbar-nav{display:flex;gap:4px;flex:1;justify-content:center;}
+.nav-btn{font-family:var(--font-ui);font-size:12px;font-weight:600;padding:8px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;letter-spacing:0.02em;transition:all 0.2s;}
+.nav-btn:hover{border-color:var(--border2);color:var(--text);}
+.nav-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:var(--glow-accent);}
+.topbar-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.theme-btn:hover{border-color:var(--accent);box-shadow:var(--glow-accent);}
+.progress-pill{font-size:11px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;white-space:nowrap;}
+.progress-pill span{color:var(--accent);font-weight:700;}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;position:relative;z-index:10;display:flex;}
+.panel{display:none;width:100%;height:100%;overflow-y:auto;padding:28px;}
+.panel.active{display:flex;flex-direction:column;gap:20px;}
+.panel::-webkit-scrollbar{width:4px;}
+.panel::-webkit-scrollbar-track{background:transparent;}
+.panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* STUDY PANEL */
+.study-layout{display:grid;grid-template-columns:230px 1fr;gap:20px;height:100%;}
+.track-sidebar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;gap:6px;height:fit-content;position:sticky;top:0;}
+.sidebar-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-weight:600;}
+.track-btn{font-family:var(--font-ui);font-size:11px;font-weight:600;padding:10px 14px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--text2);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.track-btn:hover{background:var(--surface2);color:var(--text);}
+.track-btn.active{background:linear-gradient(135deg,rgba(56,189,248,0.15),rgba(129,140,248,0.1));border-color:var(--border2);color:var(--accent);}
+.track-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.modules-area{display:flex;flex-direction:column;gap:12px;}
+.module-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color 0.2s;}
+.module-card:hover{border-color:var(--border2);}
+.module-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;}
+.module-num{font-family:var(--font-mono);font-size:10px;color:var(--accent);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:6px;padding:2px 8px;white-space:nowrap;}
+.module-title{font-family:var(--font-display);font-size:14px;font-weight:700;}
+.module-progress{font-size:10px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+.module-chevron{color:var(--text3);transition:transform 0.3s;font-size:11px;flex-shrink:0;}
+.module-card.open .module-chevron{transform:rotate(180deg);}
+.module-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease;border-top:0px solid var(--border);}
+.module-card.open .module-body{max-height:1200px;border-top-width:1px;}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;padding:14px;}
+.topic-chip{font-family:var(--font-ui);font-size:11px;padding:8px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;user-select:none;}
+.topic-chip:hover{border-color:var(--accent);color:var(--text);}
+.topic-chip.studied{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.3);color:var(--correct);}
+.topic-chip .check{font-size:10px;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;gap:16px;}
+.section-title{font-family:var(--font-display);font-size:24px;font-weight:800;}
+.section-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.divider{flex:1;height:1px;background:var(--border);}
+
+/* QUIZ SELECT */
+.quiz-select-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px;margin:0 auto;width:100%;}
+.mode-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;cursor:pointer;transition:all 0.3s;display:flex;flex-direction:column;gap:14px;}
+.mode-card:hover{border-color:var(--accent);box-shadow:var(--glow-accent);transform:translateY(-3px);}
+.mode-icon{font-size:38px;line-height:1;}
+.mode-title{font-family:var(--font-display);font-size:20px;font-weight:800;}
+.mode-desc{font-size:12px;color:var(--text2);line-height:1.7;}
+.topic-select{width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:var(--font-ui);font-size:12px;cursor:pointer;}
+.start-quiz-btn{font-family:var(--font-display);font-size:14px;font-weight:800;padding:12px 28px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;letter-spacing:0.02em;transition:all 0.2s;box-shadow:var(--glow-accent);}
+.start-quiz-btn:hover{transform:scale(1.03);}
+.start-quiz-btn:disabled{opacity:0.4;pointer-events:none;}
+
+/* MCQ QUIZ */
+.quiz-layout{max-width:780px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:20px;}
+.quiz-header{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;}
+.quiz-title{font-family:var(--font-display);font-size:16px;font-weight:700;flex:1;}
+.quiz-progress-bar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.quiz-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.4s;}
+.q-counter{font-size:11px;color:var(--text2);white-space:nowrap;}
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;display:flex;flex-direction:column;gap:18px;}
+.question-text{font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.5;}
+.options-grid{display:flex;flex-direction:column;gap:10px;}
+.option-btn{width:100%;text-align:left;padding:14px 18px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--font-ui);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s;}
+.option-btn:hover:not(:disabled){border-color:var(--border2);background:var(--surface2);}
+.option-btn:disabled{cursor:default;}
+.option-letter{width:28px;height:28px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);flex-shrink:0;font-family:var(--font-mono);}
+.option-btn.correct{background:rgba(52,211,153,0.1);border-color:var(--correct);box-shadow:var(--glow-correct);}
+.option-btn.correct .option-letter{background:var(--correct);color:#000;border-color:var(--correct);}
+.option-btn.wrong{background:rgba(248,113,113,0.1);border-color:var(--wrong);box-shadow:var(--glow-wrong);}
+.option-btn.wrong .option-letter{background:var(--wrong);color:#fff;border-color:var(--wrong);}
+.explain-box{background:var(--bg2);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;font-size:12px;color:var(--text2);line-height:1.7;display:none;}
+.explain-box.show{display:block;}
+.next-btn{align-self:flex-end;font-family:var(--font-ui);font-size:12px;font-weight:700;padding:10px 24px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:all 0.2s;display:none;}
+.next-btn.show{display:block;}
+.next-btn:hover{background:var(--accent);color:#fff;box-shadow:var(--glow-accent);}
+.score-badge{font-size:11px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;}
+
+/* RESULTS */
+.results-card{max-width:580px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:44px;text-align:center;display:flex;flex-direction:column;gap:20px;}
+.results-score{font-family:var(--font-display);font-size:76px;font-weight:900;line-height:1;}
+.results-score.pass{color:var(--correct);text-shadow:var(--glow-correct);}
+.results-score.fail{color:var(--wrong);text-shadow:var(--glow-wrong);}
+.results-label{font-family:var(--font-display);font-size:20px;color:var(--text2);}
+.results-actions{display:flex;gap:12px;justify-content:center;}
+
+/* CODE QUIZ */
+.code-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100vh - 130px);}
+.code-problem{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+.code-problem-num{font-size:10px;color:var(--accent);background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:6px;padding:2px 10px;width:fit-content;font-family:var(--font-mono);letter-spacing:0.05em;text-transform:uppercase;}
+.code-problem-title{font-family:var(--font-display);font-size:17px;font-weight:700;}
+.code-problem-desc{font-size:12px;color:var(--text2);line-height:1.8;}
+.code-example{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--rn-blue);line-height:1.6;white-space:pre;}
+.code-example-label{font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+.code-editor-side{display:flex;flex-direction:column;gap:12px;}
+.editor-wrapper{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;}
+.editor-topbar{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text3);background:var(--surface);}
+.editor-dot{width:10px;height:10px;border-radius:50%;}
+.code-textarea{width:100%;height:calc(100% - 34px);background:transparent;border:none;outline:none;color:var(--rn-blue);font-family:var(--font-mono);font-size:13px;padding:16px;resize:none;line-height:1.7;tab-size:2;}
+.code-actions{display:flex;gap:10px;}
+.run-btn{font-family:var(--font-display);font-size:13px;font-weight:700;padding:11px 28px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent3),var(--accent));color:#000;transition:all 0.2s;}
+.run-btn:hover{transform:scale(1.03);}
+.run-btn:disabled{opacity:0.4;cursor:wait;}
+.clear-btn{font-family:var(--font-ui);font-size:11px;font-weight:600;padding:11px 20px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;}
+.clear-btn:hover{border-color:var(--wrong);color:var(--wrong);}
+.output-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:var(--font-mono);font-size:12px;color:var(--text2);line-height:1.6;min-height:80px;max-height:200px;overflow-y:auto;}
+.output-box.pass{border-color:var(--correct);color:var(--correct);}
+.output-box.fail{border-color:var(--wrong);color:var(--wrong);}
+.code-nav{display:flex;align-items:center;gap:12px;}
+.code-nav-btn{font-family:var(--font-ui);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;transition:all 0.2s;}
+.code-nav-btn:hover:not(:disabled){border-color:var(--border2);color:var(--text);}
+.code-nav-btn:disabled{opacity:0.3;cursor:default;}
+.pyodide-status{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;margin-left:auto;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--wrong);transition:background 0.3s;}
+.status-dot.ready{background:var(--correct);}
+.status-dot.loading{background:var(--accent);animation:pulse 1s infinite;}
+.pyodide-loader{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:10px;z-index:1000;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.note-box{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);border-radius:10px;padding:12px 16px;font-size:11px;color:var(--text2);line-height:1.7;}
+.note-box strong{color:var(--accent);}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.animate-in{animation:slideUp 0.4s ease both;}
+.pop-in{animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275) both;}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+@media(max-width:768px){
+  .study-layout{grid-template-columns:1fr;}
+  .quiz-select-layout{grid-template-columns:1fr;}
+  .code-layout{grid-template-columns:1fr;height:auto;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">⚛</div>
+    RN Cert
+  </div>
+  <nav class="topbar-nav">
+    <button class="nav-btn active" onclick="showPanel('study')">📖 Study</button>
+    <button class="nav-btn" onclick="showPanel('mcq-select')">🧠 MCQ Quiz</button>
+    <button class="nav-btn" onclick="showPanel('code-select')">💻 Code Quiz</button>
+  </nav>
+  <div class="topbar-right">
+    <div class="progress-pill">Studied: <span id="studied-count">0</span> / <span id="total-topics">0</span></div>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STUDY PANEL -->
+  <div class="panel active" id="panel-study">
+    <div class="section-header animate-in">
+      <div>
+        <div class="section-title">React Native Syllabus</div>
+        <div class="section-sub">Click topics to mark as studied · Track your progress</div>
+      </div>
+      <div class="divider"></div>
+    </div>
+    <div class="study-layout animate-in" style="animation-delay:0.1s">
+      <div class="track-sidebar">
+        <div class="sidebar-label">Tracks</div>
+        <button class="track-btn active" onclick="showTrack(0)"><span class="track-dot" style="background:#61dafb"></span>Core RN</button>
+        <button class="track-btn" onclick="showTrack(1)"><span class="track-dot" style="background:#818cf8"></span>Navigation</button>
+        <button class="track-btn" onclick="showTrack(2)"><span class="track-dot" style="background:#34d399"></span>State & Data</button>
+        <button class="track-btn" onclick="showTrack(3)"><span class="track-dot" style="background:#fb923c"></span>Advanced</button>
+      </div>
+      <div class="modules-area" id="modules-area"></div>
+    </div>
+  </div>
+
+  <!-- MCQ SELECT -->
+  <div class="panel" id="panel-mcq-select">
+    <div class="section-header animate-in">
+      <div>
+        <div class="section-title">MCQ Quiz</div>
+        <div class="section-sub">15 questions per quiz · Instant feedback · Detailed explanations</div>
+      </div>
+      <div class="divider"></div>
+    </div>
+    <div class="quiz-select-layout animate-in" style="animation-delay:0.1s">
+      <div class="mode-card">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-title">Topic Quiz</div>
+        <div class="mode-desc">Select a specific module and get 15 MCQs focused on that topic. Perfect for targeted revision before exams.</div>
+        <select class="topic-select" id="topic-select">
+          <option value="">— Pick a module —</option>
+        </select>
+        <button class="start-quiz-btn" onclick="startTopicQuiz()">Start Topic Quiz →</button>
+      </div>
+      <div class="mode-card" onclick="startMixedQuiz()">
+        <div class="mode-icon">🔀</div>
+        <div class="mode-title">Mixed Exam</div>
+        <div class="mode-desc">15 questions randomly shuffled across all React Native topics. Full certification simulation mode.</div>
+        <div style="flex:1"></div>
+        <button class="start-quiz-btn" onclick="event.stopPropagation();startMixedQuiz()">Start Mixed Exam →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MCQ ACTIVE -->
+  <div class="panel" id="panel-mcq">
+    <div class="quiz-layout" id="quiz-container"></div>
+  </div>
+
+  <!-- CODE SELECT -->
+  <div class="panel" id="panel-code-select">
+    <div class="section-header animate-in">
+      <div>
+        <div class="section-title">Code Quiz</div>
+        <div class="section-sub">10 JavaScript/React logic challenges · Runs in browser</div>
+      </div>
+      <div class="divider"></div>
+    </div>
+    <div class="quiz-select-layout animate-in" style="animation-delay:0.1s">
+      <div class="mode-card" onclick="startCodeQuiz()">
+        <div class="mode-icon">⚛</div>
+        <div class="mode-title">Logic Challenges</div>
+        <div class="mode-desc">10 JavaScript/React logic problems. Write real JS code, test your understanding of RN concepts.</div>
+        <div style="flex:1"></div>
+        <button class="start-quiz-btn" onclick="event.stopPropagation();startCodeQuiz()">Start Coding →</button>
+      </div>
+      <div class="mode-card" style="opacity:0.6;pointer-events:none;">
+        <div class="mode-icon">📱</div>
+        <div class="mode-title">Snack Sandbox</div>
+        <div class="mode-desc">Full RN component preview coming soon — test actual components with Expo Snack integration.</div>
+        <div style="flex:1"></div>
+        <button class="start-quiz-btn" disabled>Coming Soon</button>
+      </div>
+    </div>
+    <div class="note-box animate-in" style="max-width:920px;margin:0 auto;width:100%;animation-delay:0.2s">
+      <strong>📝 Note:</strong> React Native runs on mobile — the Code Quiz tests your <strong>JavaScript & React logic</strong> (the core of RN) directly in the browser using Pyodide for Python-style challenges. For actual RN component testing, use <strong>Expo Snack</strong> at snack.expo.dev.
+    </div>
+  </div>
+
+  <!-- CODE ACTIVE -->
+  <div class="panel" id="panel-code">
+    <div class="code-layout" id="code-container"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="panel" id="panel-results">
+    <div class="results-card pop-in" id="results-card"></div>
+  </div>
+
+</div>
+
+<div class="pyodide-loader" id="pyodide-toast">
+  <div class="status-dot loading" id="py-dot"></div>
+  <span id="py-status">Loading Python runtime…</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   SYLLABUS DATA — REACT NATIVE
+══════════════════════════════════════════════════ */
+const SYLLABUS = [
+  {
+    track: "Core RN", color: "#61dafb",
+    modules: [
+      { id:"rn1", title:"Introduction to React Native", topics:["What is React Native?","RN vs React.js","RN vs Flutter vs Native","Setting Up Environment","Expo vs React Native CLI","Project Structure Overview","Running on Simulator/Device","Hot Reloading & Fast Refresh"] },
+      { id:"rn2", title:"Core Components", topics:["View & Text","Image & ImageBackground","TextInput","ScrollView","FlatList","SectionList","Button & TouchableOpacity","SafeAreaView","StatusBar","KeyboardAvoidingView"] },
+      { id:"rn3", title:"Styling in React Native", topics:["StyleSheet API","Flexbox in React Native","Dimensions API","Platform-specific Styles","Dynamic Styles","Responsive Design","Shadows & Elevation","Fonts & Text Styling"] },
+      { id:"rn4", title:"React Fundamentals for RN", topics:["Functional Components","Props & PropTypes","useState Hook","useEffect Hook","useRef Hook","useContext Hook","Custom Hooks","Component Lifecycle"] },
+      { id:"rn5", title:"Handling User Input", topics:["TextInput Events","Keyboard Handling","Form Validation","TouchableHighlight","TouchableNativeFeedback","Gesture Responder System","Pressable Component","Switch & Slider"] },
+    ]
+  },
+  {
+    track: "Navigation", color: "#818cf8",
+    modules: [
+      { id:"nav1", title:"React Navigation Setup", topics:["Installing React Navigation","Navigation Container","Stack Navigator","Tab Navigator","Drawer Navigator","Navigation Props","Linking & Deep Linking","Navigation Themes"] },
+      { id:"nav2", title:"Stack Navigation", topics:["createNativeStackNavigator","Pushing & Popping Screens","Passing Params","Going Back","Screen Options & Headers","Header Buttons","Nested Navigators","Modal Screens"] },
+      { id:"nav3", title:"Tab & Drawer Navigation", topics:["Bottom Tab Navigator","Material Top Tabs","Tab Bar Customization","Drawer Navigator Setup","Custom Drawer Content","Combining Stack & Tabs","Active Tab Indicators","Badge on Tab Icons"] },
+      { id:"nav4", title:"Advanced Navigation", topics:["Authentication Flow","Deep Linking","Linking Configuration","Navigation State","Tab Jumping","Prevent Going Back","useNavigation Hook","useFocusEffect Hook"] },
+    ]
+  },
+  {
+    track: "State & Data", color: "#34d399",
+    modules: [
+      { id:"sd1", title:"State Management", topics:["Local State with useState","Context API","useReducer Hook","Redux Toolkit Basics","Redux Thunk","Zustand","Jotai","Recoil Overview"] },
+      { id:"sd2", title:"Async Storage & Persistence", topics:["AsyncStorage Basics","Storing & Retrieving Data","Clearing Storage","MMKV Storage","React Native MMKV","SecureStore (Expo)","SQLite in React Native","Realm Database"] },
+      { id:"sd3", title:"Networking & APIs", topics:["fetch() in React Native","Axios Setup","GET & POST Requests","Error Handling","Loading States","React Query / TanStack Query","SWR for Data Fetching","WebSockets in RN"] },
+      { id:"sd4", title:"Firebase Integration", topics:["Firebase Setup for RN","Authentication (Email/Phone)","Firestore CRUD","Realtime Database","Firebase Storage","Cloud Functions","Push Notifications with FCM","Analytics"] },
+    ]
+  },
+  {
+    track: "Advanced", color: "#fb923c",
+    modules: [
+      { id:"adv1", title:"Animations", topics:["Animated API Basics","useAnimatedValue","Timing & Spring Animations","Interpolation","LayoutAnimation","React Native Reanimated","Gesture Handler","Shared Element Transitions"] },
+      { id:"adv2", title:"Native Modules & Expo", topics:["Expo SDK Overview","Camera & ImagePicker","Location & Maps","Notifications","Sensors & Haptics","Linking (Open URLs/Maps)","Contacts & Calendar","Custom Native Modules"] },
+      { id:"adv3", title:"Performance Optimization", topics:["Re-render Prevention","useMemo & useCallback","FlatList Optimization","Hermes Engine","Flipper Debugging","Bundle Size Optimization","Lazy Loading","Profiling with DevTools"] },
+      { id:"adv4", title:"Testing & Deployment", topics:["Jest for React Native","React Native Testing Library","E2E with Detox","Expo EAS Build","App Store Deployment","Play Store Deployment","CI/CD with GitHub Actions","OTA Updates with Expo"] },
+      { id:"adv5", title:"TypeScript in React Native", topics:["TypeScript Setup","Typing Props & State","Typing Navigation","API Response Types","Generic Components","Utility Types","Strict Mode","Migration from JS"] },
+    ]
+  }
+];
+
+/* ══════════════════════════════════════════════════
+   MCQ QUESTION BANK
+══════════════════════════════════════════════════ */
+const QUESTIONS = {
+  rn1:[
+    {q:"What is React Native?",opts:["A CSS framework","A framework for building native mobile apps using JavaScript and React","A database for mobile apps","A native iOS-only framework"],ans:1,exp:"React Native lets you build truly native mobile apps for iOS and Android using JavaScript and React — the UI renders as real native components."},
+    {q:"What command creates a new Expo project?",opts:["npm create expo","npx create-expo-app MyApp","expo new MyApp","react-native init MyApp"],ans:1,exp:"npx create-expo-app MyApp is the current recommended way to start a new Expo project."},
+    {q:"What is the key difference between Expo and React Native CLI?",opts:["Expo is faster","Expo provides a managed workflow with pre-built native modules; CLI gives full native control","Expo only works on iOS","CLI requires Python"],ans:1,exp:"Expo (managed workflow) abstracts native code — great for beginners. CLI gives full access to native iOS/Android code — needed for custom native modules."},
+    {q:"What is Hot Reloading in React Native?",opts:["Restarting the app fully","Injecting updated JS without losing component state","Compiling native code faster","Clearing the cache"],ans:1,exp:"Hot Reloading (now Fast Refresh) injects updated code into the running app and preserves component state where possible."},
+    {q:"What file is the entry point of a React Native app?",opts:["main.js","App.tsx or App.js","index.android.js","start.js"],ans:1,exp:"App.js (or App.tsx for TypeScript) is the root component. index.js registers it with AppRegistry."},
+    {q:"Which simulator is used to test React Native apps on macOS for iOS?",opts:["Android Studio","Genymotion","Xcode Simulator","Visual Studio Emulator"],ans:2,exp:"Xcode Simulator (on macOS) is used to test iOS builds. Android Studio's emulator is used for Android."},
+    {q:"What does Metro do in React Native?",opts:["Builds native binaries","Bundles JavaScript for the app","Manages app state","Handles navigation"],ans:1,exp:"Metro is React Native's JavaScript bundler — it transforms and bundles your JS code to serve to the device/emulator."},
+    {q:"Which command starts a React Native project with CLI?",opts:["npx react-native start","npx react-native run-android","react-native launch","npm start android"],ans:1,exp:"npx react-native run-android (or run-ios) builds and launches your app on the connected device/emulator."},
+    {q:"What language does React Native use for UI logic?",opts:["Dart","Swift","JavaScript / TypeScript","Kotlin"],ans:2,exp:"React Native uses JavaScript (or TypeScript) for all your component logic, state, and business logic."},
+    {q:"What is the bridge in React Native?",opts:["A navigation library","The communication layer between JS and native modules","A styling API","A database driver"],ans:1,exp:"The Bridge allows JavaScript to communicate with native iOS/Android code asynchronously. The new JSI (JavaScript Interface) replaces it in modern RN."},
+    {q:"What does JSI stand for in modern React Native?",opts:["JavaScript Interface","JSON Schema Injector","Java Service Interface","JavaScript Injector"],ans:0,exp:"JSI (JavaScript Interface) is a new architecture that allows direct communication between JS and native code without the async bridge."},
+    {q:"Which of these is NOT a valid React Native platform?",opts:["android","ios","web (with RN Web)","windows (with RN Windows)"],ans:3,exp:"Actually Windows IS supported via React Native for Windows! All options listed are valid RN targets."},
+    {q:"What does Expo Go allow you to do?",opts:["Submit apps to App Store directly","Test Expo apps on a physical device without building","Write Swift code","Access native modules only"],ans:1,exp:"Expo Go is an app you install on your phone to instantly preview Expo projects by scanning a QR code — no build needed."},
+    {q:"What is the purpose of app.json in Expo?",opts:["Stores API keys","Configures app name, icon, splash screen, permissions, and build settings","Defines navigation routes","Stores component styles"],ans:1,exp:"app.json (or app.config.js) holds Expo configuration: app name, version, icons, splash screen, permissions, plugins, etc."},
+    {q:"Which package manager is commonly used with React Native projects?",opts:["pip","cargo","npm or yarn","gem"],ans:2,exp:"npm or yarn are both widely used. Expo projects often default to npm; many CLI projects use yarn for faster installs."},
+  ],
+  rn2:[
+    {q:"What is the equivalent of <div> in React Native?",opts:["<Div>","<Box>","<View>","<Container>"],ans:2,exp:"<View> is the fundamental building block in RN — maps to UIView on iOS and android.view.View on Android."},
+    {q:"Which component should you use for long scrollable lists?",opts:["ScrollView","FlatList","ListView","ListView"],ans:1,exp:"FlatList is optimized for long lists — it only renders visible items (virtualized). ScrollView renders everything at once."},
+    {q:"What does SectionList provide over FlatList?",opts:["Better performance","Support for grouped sections with headers","Horizontal scrolling","Infinite loading"],ans:1,exp:"SectionList renders grouped data with section headers — perfect for contact lists, settings pages, etc."},
+    {q:"What is the purpose of SafeAreaView?",opts:["Makes content safe from XSS","Adds padding to avoid notches, status bars, and home indicators","Centers content","Provides security scanning"],ans:1,exp:"SafeAreaView renders content within the safe area boundaries of a device — avoiding notches, Dynamic Island, and bottom home bars."},
+    {q:"How do you display an image from a URL in React Native?",opts:["<img src='url' />","<Image source='url' />","<Image source={{uri:'url'}} />","<Photo url='url' />"],ans:2,exp:"<Image source={{uri: 'https://...'}} /> loads remote images. Local images use require('./image.png')."},
+    {q:"What prop does FlatList require for its data?",opts:["items","list","data","source"],ans:2,exp:"FlatList requires a 'data' prop (array) and a 'renderItem' prop (function that returns JSX for each item)."},
+    {q:"What does the 'keyExtractor' prop do in FlatList?",opts:["Sorts list items","Provides a unique key string for each item","Filters items","Encrypts data"],ans:1,exp:"keyExtractor extracts a unique key for each item — crucial for React's reconciliation algorithm to efficiently update the list."},
+    {q:"Which component is best for multiline text input?",opts:["TextInput with multiline={true}","MultilineInput","TextArea","Input type='textarea'"],ans:0,exp:"Set multiline={true} on TextInput for multiline text input. numberOfLines controls initial height."},
+    {q:"What does the 'onPress' event do?",opts:["Fires on long press","Fires on button/touchable press","Fires on scroll","Fires on text change"],ans:1,exp:"onPress is triggered when the user taps a Touchable/Button/Pressable component — equivalent to onClick on web."},
+    {q:"What's the difference between TouchableOpacity and Pressable?",opts:["No difference","Pressable is more flexible with style callbacks for pressed state","TouchableOpacity is deprecated","Pressable only works on Android"],ans:1,exp:"Pressable is the newer, more flexible component — its style prop accepts a function to apply styles based on pressed/focused state."},
+    {q:"What is the purpose of KeyboardAvoidingView?",opts:["Prevents keyboard from appearing","Moves content up when the keyboard appears so inputs stay visible","Handles keyboard shortcuts","Dismisses keyboard on tap"],ans:1,exp:"KeyboardAvoidingView adjusts its height/position when the keyboard opens — keeps form inputs from being covered."},
+    {q:"Which prop on ScrollView enables horizontal scrolling?",opts:["direction='horizontal'","axis='x'","horizontal={true}","scrollX={true}"],ans:2,exp:"<ScrollView horizontal={true}> enables horizontal scrolling. Combine with pagingEnabled for paged carousels."},
+    {q:"What does the StatusBar component control?",opts:["Battery status","The mobile status bar appearance (color, style, visibility)","Network status","App version"],ans:1,exp:"<StatusBar> lets you control the status bar style (light/dark), background color, and visibility for your screen."},
+    {q:"How do you add a placeholder to TextInput?",opts:["hint='text'","placeholder='text'","label='text'","title='text'"],ans:1,exp:"The placeholder prop shows grey hint text when the TextInput is empty: <TextInput placeholder='Enter name' />"},
+    {q:"What does the ImageBackground component do?",opts:["Blurs an image","Renders children over a background image","Crops images","Fetches images lazily"],ans:1,exp:"<ImageBackground source={...}> allows you to nest child components on top of an image — like CSS background-image with content inside."},
+  ],
+  rn3:[
+    {q:"How do you create styles in React Native?",opts:["Using CSS files","Using StyleSheet.create({})","Using inline style strings","Using SCSS"],ans:1,exp:"StyleSheet.create({}) is the React Native way to define styles. It validates style properties and optimizes performance."},
+    {q:"What layout system does React Native use?",opts:["CSS Grid","Float-based layout","Flexbox","Table layout"],ans:2,exp:"React Native uses Flexbox for all layout — but with different defaults: flexDirection defaults to 'column' (not 'row' like web)."},
+    {q:"What is the default flexDirection in React Native?",opts:["row","row-reverse","column","column-reverse"],ans:2,exp:"Unlike CSS (which defaults to 'row'), React Native's flexDirection defaults to 'column' — items stack vertically."},
+    {q:"How do you make a component take up all available space?",opts:["width:'100%', height:'100%'","flex: 1","flexGrow: 1","position:'absolute'"],ans:1,exp:"flex: 1 tells the component to expand and fill all available space. It's the most common way to create full-screen views."},
+    {q:"Which API helps you get screen dimensions?",opts:["window.innerWidth","Dimensions.get('window')","Screen.size","PixelRatio.getSize()"],ans:1,exp:"Dimensions.get('window') returns {width, height} of the screen. Use the useWindowDimensions hook for automatic updates on orientation change."},
+    {q:"How do you add a shadow on iOS in React Native?",opts:["boxShadow","shadowColor, shadowOffset, shadowOpacity, shadowRadius","elevation","dropShadow"],ans:1,exp:"iOS uses shadowColor, shadowOffset, shadowOpacity, and shadowRadius. Android uses 'elevation'. There's no cross-platform boxShadow in RN."},
+    {q:"What does 'elevation' style prop do?",opts:["Moves element up visually","Adds Android shadow and controls z-index on Android","Sets z-index on iOS","Rotates element"],ans:1,exp:"elevation is an Android-specific prop that adds a material design shadow and affects z-ordering. On iOS, use shadow* props instead."},
+    {q:"How do you apply different styles per platform?",opts:["CSS media queries","Platform.OS === 'ios' ? styleA : styleB or Platform.select({})","PlatformStyleSheet","platformSpecific prop"],ans:1,exp:"Use Platform.OS or Platform.select({ios: {...}, android: {...}}) to apply platform-specific styles."},
+    {q:"What is the unit used for dimensions in React Native?",opts:["px","em","rem","Density-independent pixels (no unit needed)"],ans:3,exp:"RN uses density-independent pixels — you just write numbers (e.g., width: 100). RN automatically scales to the device's pixel density."},
+    {q:"How do you center content both vertically and horizontally using Flexbox?",opts:["textAlign:'center'","margin:'auto'","alignItems:'center', justifyContent:'center'","center:true"],ans:2,exp:"On a View with flex:1, set alignItems:'center' (cross axis) and justifyContent:'center' (main axis) to center children both ways."},
+    {q:"What does 'alignItems' control in Flexbox?",opts:["Alignment along the main axis","Alignment along the cross axis","Spacing between items","Item wrapping"],ans:1,exp:"alignItems aligns children along the CROSS axis (horizontal if flexDirection is 'column'). Like CSS align-items."},
+    {q:"What does 'justifyContent' control?",opts:["Cross axis alignment","Main axis alignment and spacing","Item flex ratios","Text alignment"],ans:1,exp:"justifyContent controls alignment and spacing along the MAIN axis (vertical when flexDirection is 'column')."},
+    {q:"How do you load a custom font in Expo?",opts:["@import in StyleSheet","useFonts() from expo-font","FontFace API","font-family in app.json"],ans:1,exp:"Use useFonts() from expo-font to load custom fonts asynchronously before rendering your app."},
+    {q:"What is the purpose of PixelRatio in React Native?",opts:["Controls animation fps","Gets the device pixel density ratio for scaling","Measures component sizes","Controls image resolution"],ans:1,exp:"PixelRatio.get() returns the device's pixel ratio (e.g., 3 for iPhone 12). PixelRatio.roundToNearestPixel() helps with precise layouts."},
+    {q:"How do you make text bold in React Native?",opts:["<b>text</b>","text-decoration: bold","fontWeight: 'bold'","<strong>text</strong>"],ans:2,exp:"Set fontWeight: 'bold' (or '700') in the style object on a <Text> component. HTML tags like <b> don't work in RN."},
+  ],
+  rn4:[
+    {q:"What is useState used for in React Native?",opts:["HTTP requests","Managing local component state","Navigation","Styling"],ans:1,exp:"useState adds local state to functional components. const [count, setCount] = useState(0); — returns current value and setter function."},
+    {q:"When does useEffect run by default?",opts:["Only on mount","Only on unmount","After every render","Before first render"],ans:2,exp:"Without a dependency array, useEffect runs after EVERY render. Add [] for mount-only, or [dep] to run when dep changes."},
+    {q:"What does useRef return?",opts:["A state variable","A mutable ref object that persists across renders without causing re-renders","A callback","A DOM element"],ans:1,exp:"useRef returns {current: initialValue}. Changing .current doesn't trigger re-renders — perfect for storing timers, input references, etc."},
+    {q:"What is the Context API used for?",opts:["HTTP caching","Sharing state across components without prop drilling","Database connections","Navigation state"],ans:1,exp:"Context API provides a way to share values (theme, user, language) across the component tree without passing props at every level."},
+    {q:"What does useCallback do?",opts:["Memoizes a value","Memoizes a function reference","Creates a new callback each render","Runs a side effect"],ans:1,exp:"useCallback(fn, deps) returns a memoized version of the callback — prevents child re-renders when the parent re-renders."},
+    {q:"What does useMemo do?",opts:["Memoizes a function","Memoizes a computed value — recalculates only when deps change","Runs async operations","Stores a ref"],ans:1,exp:"useMemo(fn, deps) memoizes an expensive computed value — only recalculates when dependencies change. Useful for heavy computations."},
+    {q:"What is prop drilling?",opts:["Adding props to native modules","Passing props through many intermediate components just to reach a deep child","Testing props","Prop type checking"],ans:1,exp:"Prop drilling is the pattern of passing data through many component layers. Context, Redux, or Zustand can solve this."},
+    {q:"What is a custom Hook?",opts:["A built-in React hook","A function starting with 'use' that reuses stateful logic","A styled component","A navigation hook"],ans:1,exp:"Custom hooks are functions starting with 'use' that encapsulate reusable stateful logic — e.g., useFetch, useDebounce."},
+    {q:"What does the dependency array in useEffect control?",opts:["When the effect runs","The initial state value","The component's key","Props passed to the effect"],ans:0,exp:"The dependency array controls WHEN the effect re-runs: [] = once on mount, [x] = whenever x changes, omitted = every render."},
+    {q:"What is the difference between props and state?",opts:["No difference","Props are passed from parent (immutable in child); state is internal and mutable","State comes from parent; props are internal","Both are the same thing"],ans:1,exp:"Props flow DOWN from parent (read-only in child). State is internal to the component and can change via setState/useState."},
+    {q:"Which hook replaces componentDidMount and componentDidUpdate?",opts:["useState","useRef","useEffect","useContext"],ans:2,exp:"useEffect with [] replaces componentDidMount. Without [], it replaces componentDidUpdate. Cleanup function replaces componentWillUnmount."},
+    {q:"What does the cleanup function in useEffect do?",opts:["Resets state","Runs before the next effect or on unmount — used to clear timers, subscriptions","Clears the cache","Re-mounts the component"],ans:1,exp:"Return a function from useEffect to clean up: clear intervals, cancel subscriptions, remove listeners — runs before next effect or unmount."},
+    {q:"What are PropTypes used for?",opts:["Type checking props at runtime in development","Styling components","Navigation","Database validation"],ans:0,exp:"PropTypes provide runtime type checking for component props in development — warns in console if wrong type is passed."},
+    {q:"How do you share state between sibling components?",opts:["Direct sibling communication","Lift state up to their common parent, or use Context/Redux","Use a global variable","Via NavigationParam"],ans:1,exp:"Lift state up: move state to the closest common ancestor, then pass it down as props. For deeper sharing, use Context or a state manager."},
+    {q:"What does React.memo do?",opts:["Memoizes a hook","Wraps a component to prevent re-renders if props haven't changed","Creates a ref","Memoizes context"],ans:1,exp:"React.memo(Component) is a HOC that skips re-rendering if props are shallowly equal — similar to PureComponent for class components."},
+  ],
+  nav1:[
+    {q:"Which library is the standard navigation solution for React Native?",opts:["React Router","React Navigation","Navigator.js","RN Router"],ans:1,exp:"React Navigation (@react-navigation/native) is the community standard for routing and navigation in React Native apps."},
+    {q:"What is the root component that must wrap all navigators?",opts:["AppNavigator","NavigationWrapper","NavigationContainer","RootNavigator"],ans:2,exp:"<NavigationContainer> is required at the root — it manages navigation state and links the navigation tree."},
+    {q:"What does a Stack Navigator do?",opts:["Creates a tab bar","Manages a stack of screens — users push/pop screens like a stack of cards","Creates a side menu","Handles URL routing"],ans:1,exp:"Stack Navigator keeps a stack of screens. New screens are pushed on top; going back pops them. Creates a card-style navigation pattern."},
+    {q:"Which navigator shows tabs at the bottom of the screen?",opts:["createDrawerNavigator","createStackNavigator","createBottomTabNavigator","createMaterialTopTabNavigator"],ans:2,exp:"createBottomTabNavigator from @react-navigation/bottom-tabs creates the classic iOS/Android bottom tab bar."},
+    {q:"How do you navigate to a screen named 'Profile'?",opts:["navigate.go('Profile')","this.props.navigation.push('Profile')","navigation.navigate('Profile')","router.push('/Profile')"],ans:2,exp:"navigation.navigate('Profile') moves to the Profile screen. The navigation prop is available in every screen component."},
+    {q:"How do you pass parameters when navigating?",opts:["navigation.navigate('Screen', {key: value})","navigation.send('Screen', {key:value})","navigation.params('Screen', {key:value})","URL query strings"],ans:0,exp:"navigation.navigate('ScreenName', { userId: 42 }) passes params. Receive with route.params.userId in the destination screen."},
+    {q:"How do you read params in the destination screen?",opts:["props.params","navigation.getParams()","route.params","this.state.params"],ans:2,exp:"The route prop contains route.params — access your passed data with route.params.yourKey in the screen component."},
+    {q:"What is deep linking in React Native?",opts:["Linking to internal APIs","Allowing URLs/universal links to open specific screens in the app","Linking native modules","Connecting databases"],ans:1,exp:"Deep linking lets external URLs (or push notifications) open a specific screen in your app. Configured via the linking prop on NavigationContainer."},
+    {q:"What does navigation.goBack() do?",opts:["Exits the app","Goes to the home screen","Goes back to the previous screen in the stack","Reloads the current screen"],ans:2,exp:"navigation.goBack() pops the current screen from the stack, returning to the previous screen."},
+    {q:"What is a Drawer Navigator?",opts:["A component for sorting lists","A side menu that slides in from the edge of the screen","A bottom sheet","A dropdown menu"],ans:1,exp:"Drawer Navigator creates a side navigation menu that slides in — toggled by a hamburger icon or swipe gesture."},
+    {q:"How do you set a custom header title for a screen?",opts:["options={{ title: 'My Title' }}","headerTitle='My Title'","navigation.setTitle('My Title')","screenTitle='My Title'"],ans:0,exp:"Pass options={{ title: 'My Title' }} to the Screen component. Or call navigation.setOptions({ title: 'My Title' }) dynamically."},
+    {q:"What hook gives access to navigation in a nested component?",opts:["useRouter","useNavigator","useNavigation","useRoute"],ans:2,exp:"useNavigation() returns the navigation object — useful in components that are not screen components and don't have navigation as a prop."},
+    {q:"What is the purpose of useFocusEffect?",opts:["Adds focus ring styling","Runs an effect when the screen comes into focus (replaces useEffect for screen focus)","Sets auto-focus on input","Tracks eye focus"],ans:1,exp:"useFocusEffect runs a side effect when the screen is focused. Unlike useEffect, it re-runs every time you navigate to the screen."},
+    {q:"What is nested navigation?",opts:["Navigation inside a modal","Having a navigator inside a screen that is itself inside another navigator","Navigation with animations","Recursive navigation"],ans:1,exp:"Nested navigation is having navigators within navigators — e.g., a Tab navigator where each tab contains its own Stack navigator."},
+    {q:"Which prop on NavigationContainer enables deep linking?",opts:["deepLink","urlScheme","linking","scheme"],ans:2,exp:"Pass a linking configuration object to the linking prop of NavigationContainer to enable deep links and universal links."},
+  ],
+  sd1:[
+    {q:"What is Redux used for?",opts:["Styling","Navigating between screens","Managing global application state","Database operations"],ans:2,exp:"Redux is a predictable state container — stores all global application state in a single store, making state management predictable."},
+    {q:"What are the three principles of Redux?",opts:["Component, Store, Action","Single source of truth, State is read-only, Changes via pure functions","Immutability, Reducers, Sagas","Store, Dispatch, Subscribe"],ans:1,exp:"Redux principles: 1) Single store (source of truth), 2) State is read-only (changed only by actions), 3) Changes via pure reducers."},
+    {q:"What is a Redux action?",opts:["A pure function","A plain object with a type field describing what happened","A component","A middleware"],ans:1,exp:"An action is a plain JavaScript object with a required 'type' field: { type: 'INCREMENT', payload: 1 }"},
+    {q:"What is a reducer in Redux?",opts:["A function that dispatches actions","A pure function (state, action) => newState","A component wrapper","A middleware"],ans:1,exp:"Reducers are pure functions that take (currentState, action) and return a new state — they never mutate state directly."},
+    {q:"What does Redux Toolkit's createSlice do?",opts:["Creates a new navigation route","Generates action creators and reducer from a single object — reduces Redux boilerplate","Slices an array","Creates a database schema"],ans:1,exp:"createSlice() auto-generates action creators and a reducer from your initial state and reducer functions — much less boilerplate than classic Redux."},
+    {q:"What is Zustand?",opts:["A navigation library","A lightweight state management library with minimal API","A testing framework","A styling library"],ans:1,exp:"Zustand is a tiny, simple state management library — create a store with create(), access state with a hook anywhere in your app."},
+    {q:"What hook does Redux provide to read from the store?",opts:["useStore","useRedux","useSelector","useDispatch"],ans:2,exp:"useSelector(selector) reads data from the Redux store. useDispatch() gives you the dispatch function to send actions."},
+    {q:"What is Context API's limitation at scale?",opts:["It doesn't support TypeScript","Every component consuming context re-renders when context value changes — can cause performance issues","It only works for authentication","It requires Redux"],ans:1,exp:"Context re-renders ALL consumers when the value changes. For frequently changing state, use a more granular solution like Zustand or Jotai."},
+    {q:"What does useReducer provide that useState doesn't?",opts:["Async support","Better for complex state logic with multiple sub-values and state transitions","Network calls","Navigation"],ans:1,exp:"useReducer(reducer, initialState) is preferable when state transitions are complex or the next state depends on multiple actions — like a mini-Redux."},
+    {q:"What is Jotai?",opts:["A Japanese navigation library","A primitive, atomic state management library for React — each atom is a piece of state","A testing utility","An animation library"],ans:1,exp:"Jotai provides atomic state — each atom is independent. Components only re-render when their specific atoms change — very efficient."},
+    {q:"What is the purpose of Redux middleware like Redux Thunk?",opts:["To style components","To allow action creators to return functions (for async logic) instead of plain objects","To cache API responses","To validate actions"],ans:1,exp:"Redux Thunk lets action creators return a function instead of an action object — enabling async operations like API calls inside action creators."},
+    {q:"What is the recommended way to use Redux in 2024?",opts:["Classic Redux with combineReducers","Redux Toolkit (RTK) with createSlice and createAsyncThunk","Redux with manual reducers","Redux with Sagas only"],ans:1,exp:"Redux Toolkit (RTK) is the official, opinionated way — createSlice, createAsyncThunk, and RTK Query significantly reduce boilerplate."},
+    {q:"What is Recoil?",opts:["A physics animation library","Facebook's experimental atomic state management library for React","A routing library","A database ORM"],ans:1,exp:"Recoil by Facebook provides atoms (shared state) and selectors (derived state) — integrates tightly with React's concurrent mode."},
+    {q:"When should you use local state vs global state?",opts:["Always use global state","Use local (useState) for component-specific UI state; global state for shared data across many components","Always use global state for forms","Never use local state"],ans:1,exp:"Rule of thumb: If only one component needs the state, use useState. If multiple distant components need it, lift it up or use global state."},
+    {q:"What does the Provider component do in Redux?",opts:["Provides navigation context","Makes the Redux store available to all child components","Provides styling context","Provides network access"],ans:1,exp:"<Provider store={store}> wraps your app and makes the Redux store accessible to any component via useSelector/useDispatch hooks."},
+  ],
+  sd3:[
+    {q:"How do you make a GET request in React Native without libraries?",opts:["XMLHttpRequest()","axios.get()","fetch('url').then(r=>r.json())","http.get()"],ans:2,exp:"The global fetch() API works in React Native: fetch(url).then(res => res.json()).then(data => ...). No import needed."},
+    {q:"What is the purpose of Axios over fetch?",opts:["Axios is faster","Axios automatically transforms JSON, has interceptors, better error handling, and request cancellation","Axios only works on Android","Axios is built into RN"],ans:1,exp:"Axios auto-parses JSON responses, throws on HTTP errors (unlike fetch), supports interceptors for auth headers, and request cancellation via CancelToken."},
+    {q:"What does async/await do for API calls?",opts:["Makes them synchronous","Allows writing asynchronous code in a synchronous style — cleaner than .then() chains","Cancels failed requests","Caches responses"],ans:1,exp:"async/await is syntactic sugar over Promises — async function, then await the fetch/axios call. Makes async code read like synchronous code."},
+    {q:"What is TanStack Query (React Query) used for?",opts:["Navigation","Server state management — caching, refetching, pagination, loading/error states for API calls","Styling","Local state"],ans:1,exp:"TanStack Query manages server state — automatic caching, background refetching, stale-while-revalidate, loading/error states. Massively reduces boilerplate."},
+    {q:"How do you handle loading states for API calls?",opts:["Use setTimeout","Use a boolean state variable (isLoading) toggled before/after the request","Use useEffect only","Display console.log"],ans:1,exp:"Pattern: const [isLoading, setIsLoading] = useState(false). Set true before request, false in finally block. Show spinner when isLoading is true."},
+    {q:"What HTTP method is used to create new data on a REST API?",opts:["GET","PUT","POST","DELETE"],ans:2,exp:"POST is used to create new resources. GET fetches, PUT/PATCH updates, DELETE removes. This is the REST convention."},
+    {q:"What does try/catch do when wrapping an async API call?",opts:["Cancels the request","Catches network errors and HTTP errors (with axios) — prevents app crashes","Retries the request","Caches the response"],ans:1,exp:"Wrap await calls in try/catch to handle network failures, timeouts, or HTTP errors gracefully and show user-friendly error messages."},
+    {q:"What is a WebSocket used for?",opts:["Loading images","Real-time bidirectional communication between client and server","Caching API responses","Styling"],ans:1,exp:"WebSockets provide persistent, full-duplex connections — perfect for chat apps, live scores, real-time dashboards, collaborative tools."},
+    {q:"What are authorization headers used for in API requests?",opts:["Styling the request","Sending authentication tokens (e.g., Bearer JWT) to identify the user to the server","Compressing the request","Caching"],ans:1,exp:"Authorization: Bearer <token> in request headers tells the API who the user is — the server validates the token to permit or deny access."},
+    {q:"What does pagination in API calls mean?",opts:["Loading all data at once","Loading data in chunks/pages — only fetching more as the user scrolls or requests it","Deleting old data","Sorting data"],ans:1,exp:"Pagination loads data in chunks (e.g., 20 items at a time). In FlatList, use onEndReached to trigger loading the next page."},
+    {q:"What is the purpose of an API interceptor in Axios?",opts:["Block all requests","Intercept requests/responses to add auth headers, handle refresh tokens, log errors globally","Speed up requests","Enable caching"],ans:1,exp:"Axios interceptors run before a request is sent or after a response is received — perfect for adding auth tokens to every request or handling 401 errors globally."},
+    {q:"What does the status code 401 mean?",opts:["Success","Not Found","Unauthorized — authentication required","Server Error"],ans:2,exp:"401 Unauthorized means the request lacks valid authentication. Typically means the JWT token is missing, expired, or invalid."},
+    {q:"How do you cancel a fetch request in React Native?",opts:["fetch.cancel()","Using AbortController and signal prop","request.abort()","useEffect cleanup auto-cancels"],ans:1,exp:"Create AbortController, pass controller.signal to fetch's signal option, and call controller.abort() in the useEffect cleanup function."},
+    {q:"What is the purpose of environment variables in React Native?",opts:["Style components","Store API keys, base URLs, and config values outside of source code","Speed up bundling","Handle navigation"],ans:1,exp:"Env vars (using react-native-config or Expo's .env) store sensitive or environment-specific values (API URLs, keys) outside of committed code."},
+    {q:"What does JSON.parse() do?",opts:["Converts JSON string to JS object","Converts JS object to JSON string","Validates JSON","Fetches JSON from API"],ans:0,exp:"JSON.parse(string) parses a JSON string into a JavaScript object. JSON.stringify(object) does the reverse."},
+  ],
+  adv1:[
+    {q:"What is the Animated API in React Native?",opts:["A video player","React Native's built-in library for creating smooth animations","A CSS animation port","A transition router"],ans:1,exp:"Animated API provides animated values and functions (timing, spring, decay) to create smooth, performant animations in React Native."},
+    {q:"What does Animated.timing() do?",opts:["Creates a spring animation","Animates a value to a target over a specified duration using an easing function","Triggers on touch","Loops an animation"],ans:1,exp:"Animated.timing(value, {toValue, duration, easing}) interpolates a value from current to toValue over duration ms."},
+    {q:"What is React Native Reanimated?",opts:["A set of React component animations","A high-performance animation library that runs animations on the UI thread","A navigation animation library","A CSS animation tool"],ans:1,exp:"Reanimated 2+ runs animations on the native UI thread (via JSI) — buttery smooth 60fps+ animations that don't block the JS thread."},
+    {q:"What is interpolation in animations?",opts:["Smoothing out jumpy animations","Mapping an animated value from one range to another — e.g., opacity 0-1 as Y moves 0-100","Looping animations","Reversing animations"],ans:1,exp:"Interpolation maps input ranges to output ranges: animValue.interpolate({inputRange:[0,100], outputRange:[0,1]}) — enables complex multi-property animations from one value."},
+    {q:"What does Animated.spring() provide vs timing()?",opts:["Faster execution","Physics-based animation with bounce/overshoot — more natural feel","Loop support","Better performance"],ans:1,exp:"Spring animations use physics (bounciness, stiffness) to create natural elastic animations — great for UI elements that need a 'snap' or 'bounce' feel."},
+    {q:"What is LayoutAnimation?",opts:["A navigation transition","Automatically animates layout changes (add/remove/update) in the next render","A FlatList animation","An image animation"],ans:1,exp:"LayoutAnimation.configureNext(preset) triggers automatic animations for the next state change that affects layout — simple but powerful."},
+    {q:"What is Gesture Handler used for?",opts:["Form validation","Handling complex touch gestures (swipe, pinch, pan) with better performance than RN's built-in system","Navigation gestures only","Keyboard handling"],ans:1,exp:"React Native Gesture Handler provides a more performant gesture recognition system — runs on native thread, enables complex multi-touch interactions."},
+    {q:"What is a SharedValue in Reanimated 2?",opts:["A Redux state variable","A value that lives on the UI thread and can be animated without crossing the JS/Native bridge","A shared Context value","A FlatList key"],ans:1,exp:"useSharedValue() creates a value that lives on the UI thread — updating it via worklets triggers UI updates without JS bridge overhead."},
+    {q:"What is useAnimatedStyle in Reanimated?",opts:["A CSS-in-JS solution","A hook that creates animated styles derived from shared values — updates happen on the UI thread","A static style hook","A performance profiler"],ans:1,exp:"useAnimatedStyle() returns a style object derived from shared values — when shared values change, styles update on the UI thread without re-rendering the component."},
+    {q:"What is Animated.loop() used for?",opts:["Creating reverse animations","Running an animation repeatedly in a loop","Chaining animations","Creating spring loops"],ans:1,exp:"Animated.loop(animation, {iterations}) repeats an animation a specified number of times (or infinitely with -1). Great for loading spinners."},
+    {q:"What is the purpose of useAnimatedGestureHandler?",opts:["Handling keyboard events","Connecting Gesture Handler events to Reanimated shared values on the UI thread","Styling touch targets","Navigation transitions"],ans:1,exp:"useAnimatedGestureHandler() processes gesture events (onStart, onActive, onEnd) as worklets on the UI thread — enables smooth gesture-driven animations."},
+    {q:"What is Shared Element Transition?",opts:["Sharing state between screens","Animating an element seamlessly from one screen to another — like the image expanding from a card to detail view","Sharing animations between components","A Redux pattern"],ans:1,exp:"Shared Element Transitions animate an element from its position/size on screen A to its position/size on screen B — creating a connected visual transition."},
+    {q:"What does transform style prop accept?",opts:["A string like 'rotate(90deg)'","An array of transformation objects: [{rotate:'90deg'},{scale:1.5}]","A boolean","A CSS transform string"],ans:1,exp:"transform accepts an array of transformation objects: [{translateX: x}, {rotate: '90deg'}, {scale: 1.5}]. Each transform is a separate object in the array."},
+    {q:"What is the 60fps target in animations?",opts:["Minimum for smooth video","The standard frame rate for smooth UI — each frame must complete in ~16ms","Maximum allowed on mobile","A GPU setting"],ans:1,exp:"60fps means 60 frames per second — each frame has ~16ms to compute. Animations that take longer per frame cause jank/stuttering."},
+    {q:"What is Animated.parallel() used for?",opts:["Running animations sequentially","Running multiple animations simultaneously","Cancelling animations","Chaining animations"],ans:1,exp:"Animated.parallel([anim1, anim2]) starts multiple animations at the same time. Animated.sequence([]) runs them one after another."},
+  ],
+};
+
+// Fallback for modules without specific questions
+function getModuleQuestions(mid) {
+  if (QUESTIONS[mid]) return [...QUESTIONS[mid]];
+  const allKeys = Object.keys(QUESTIONS);
+  const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
+  return [...QUESTIONS[randomKey]];
+}
+
+let ALL_QUESTIONS = [];
+for(const k of Object.keys(QUESTIONS)) ALL_QUESTIONS.push(...QUESTIONS[k]);
+
+/* ══════════════════════════════════════════════════
+   CODE CHALLENGES (JS-based, tested via Python logic)
+══════════════════════════════════════════════════ */
+const CODE_CHALLENGES = [
+  {
+    id:"c1", title:"Props Validator",
+    desc:"Write a Python function <code>validate_props(props)</code> that takes a dictionary of component props and returns <b>True</b> if it has all required keys: <b>'title'</b>, <b>'onPress'</b>, and <b>'style'</b>.",
+    example:"validate_props({'title':'Click','onPress':True,'style':{}}) → True\nvalidate_props({'title':'Click'}) → False",
+    starter:"def validate_props(props):\n    required = ['title', 'onPress', 'style']\n    # Check all required keys exist\n    pass\n\nprint(validate_props({'title':'Click','onPress':True,'style':{}}))\nprint(validate_props({'title':'Click'}))",
+    testCode:"assert validate_props({'title':'A','onPress':True,'style':{}}) == True\nassert validate_props({'title':'A'}) == False\nassert validate_props({}) == False\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c2", title:"FlatList Key Extractor",
+    desc:"Write a function <code>extract_keys(items)</code> that takes a list of dicts (each with an 'id' key) and returns a list of the id values as strings.",
+    example:"extract_keys([{'id':1,'name':'Alice'},{'id':2,'name':'Bob'}]) → ['1','2']",
+    starter:"def extract_keys(items):\n    # Return list of string id values\n    pass\n\nprint(extract_keys([{'id':1,'name':'Alice'},{'id':2,'name':'Bob'}]))",
+    testCode:"assert extract_keys([{'id':1,'name':'A'},{'id':2,'name':'B'}]) == ['1','2']\nassert extract_keys([]) == []\nassert extract_keys([{'id':99,'x':'z'}]) == ['99']\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c3", title:"StyleSheet Merger",
+    desc:"Write a function <code>merge_styles(*style_dicts)</code> that merges multiple style dictionaries, with later values overriding earlier ones (like RN's StyleSheet.flatten).",
+    example:"merge_styles({'color':'red','size':12}, {'color':'blue'}) → {'color':'blue','size':12}",
+    starter:"def merge_styles(*style_dicts):\n    result = {}\n    # Merge all dicts, later values override\n    pass\n\nprint(merge_styles({'color':'red','size':12}, {'color':'blue'}))",
+    testCode:"assert merge_styles({'a':1},{'a':2}) == {'a':2}\nassert merge_styles({'x':1,'y':2},{'y':3}) == {'x':1,'y':3}\nassert merge_styles({},{'a':1}) == {'a':1}\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c4", title:"Navigation Route Builder",
+    desc:"Write a function <code>build_route(screen_name, params)</code> that returns a dictionary with keys <b>'name'</b> and <b>'params'</b>.",
+    example:"build_route('Profile', {'userId': 42}) → {'name': 'Profile', 'params': {'userId': 42}}",
+    starter:"def build_route(screen_name, params):\n    # Build route object\n    pass\n\nprint(build_route('Profile', {'userId': 42}))",
+    testCode:"r = build_route('Home', {'tab': 1})\nassert r['name'] == 'Home'\nassert r['params'] == {'tab': 1}\nr2 = build_route('Settings', {})\nassert r2['name'] == 'Settings'\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c5", title:"State Reducer",
+    desc:"Write a function <code>counter_reducer(state, action)</code> that takes a state dict with a 'count' key and an action dict with a 'type' key. Handle types: <b>'INCREMENT'</b>, <b>'DECREMENT'</b>, <b>'RESET'</b>.",
+    example:"counter_reducer({'count':5}, {'type':'INCREMENT'}) → {'count':6}\ncounter_reducer({'count':5}, {'type':'RESET'}) → {'count':0}",
+    starter:"def counter_reducer(state, action):\n    # Return new state based on action type\n    # Don't mutate state dict!\n    pass\n\nprint(counter_reducer({'count':5}, {'type':'INCREMENT'}))\nprint(counter_reducer({'count':5}, {'type':'RESET'}))",
+    testCode:"assert counter_reducer({'count':0},{'type':'INCREMENT'}) == {'count':1}\nassert counter_reducer({'count':5},{'type':'DECREMENT'}) == {'count':4}\nassert counter_reducer({'count':99},{'type':'RESET'}) == {'count':0}\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c6", title:"API Response Handler",
+    desc:"Write a function <code>handle_response(response)</code> that takes a dict with 'status' and optional 'data'/'error' keys. Return <b>'success'</b> + data if status==200, else return <b>'error'</b> + error message.",
+    example:"handle_response({'status':200,'data':[1,2,3]}) → ('success', [1,2,3])\nhandle_response({'status':404,'error':'Not found'}) → ('error', 'Not found')",
+    starter:"def handle_response(response):\n    # Return tuple ('success', data) or ('error', message)\n    pass\n\nprint(handle_response({'status':200,'data':[1,2,3]}))\nprint(handle_response({'status':404,'error':'Not found'}))",
+    testCode:"assert handle_response({'status':200,'data':[1,2]}) == ('success',[1,2])\nassert handle_response({'status':404,'error':'Not found'}) == ('error','Not found')\nassert handle_response({'status':500,'error':'Server error'}) == ('error','Server error')\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c7", title:"Deep Link Parser",
+    desc:"Write a function <code>parse_deep_link(url)</code> that parses a URL like <b>'myapp://profile/42'</b> and returns a dict with keys <b>'screen'</b> and <b>'id'</b>.",
+    example:"parse_deep_link('myapp://profile/42') → {'screen':'profile','id':'42'}\nparse_deep_link('myapp://home/1') → {'screen':'home','id':'1'}",
+    starter:"def parse_deep_link(url):\n    # Parse URL: scheme://screen/id\n    pass\n\nprint(parse_deep_link('myapp://profile/42'))\nprint(parse_deep_link('myapp://home/1'))",
+    testCode:"assert parse_deep_link('myapp://profile/42') == {'screen':'profile','id':'42'}\nassert parse_deep_link('myapp://home/1') == {'screen':'home','id':'1'}\nassert parse_deep_link('myapp://settings/99') == {'screen':'settings','id':'99'}\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c8", title:"FlatList Data Filter",
+    desc:"Write a function <code>filter_items(items, query)</code> that filters a list of dicts by whether their <b>'name'</b> field contains the query string (case-insensitive).",
+    example:"filter_items([{'name':'Alice'},{'name':'Bob'}], 'ali') → [{'name':'Alice'}]",
+    starter:"def filter_items(items, query):\n    # Return items where name contains query (case-insensitive)\n    pass\n\nprint(filter_items([{'name':'Alice'},{'name':'Bob'},{'name':'Albert'}], 'al'))",
+    testCode:"data = [{'name':'Alice'},{'name':'Bob'},{'name':'Albert'}]\nassert filter_items(data,'al') == [{'name':'Alice'},{'name':'Albert'}]\nassert filter_items(data,'bob') == [{'name':'Bob'}]\nassert filter_items(data,'xyz') == []\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c9", title:"Async Storage Simulator",
+    desc:"Create a class <code>AsyncStore</code> with methods <code>set_item(key, value)</code>, <code>get_item(key)</code> returning the value or <b>None</b>, and <code>remove_item(key)</code>.",
+    example:"s = AsyncStore()\ns.set_item('user', 'Alice')\ns.get_item('user') → 'Alice'\ns.remove_item('user')\ns.get_item('user') → None",
+    starter:"class AsyncStore:\n    def __init__(self):\n        self.store = {}\n    \n    def set_item(self, key, value):\n        pass\n    \n    def get_item(self, key):\n        pass\n    \n    def remove_item(self, key):\n        pass\n\ns = AsyncStore()\ns.set_item('user', 'Alice')\nprint(s.get_item('user'))\ns.remove_item('user')\nprint(s.get_item('user'))",
+    testCode:"s = AsyncStore()\ns.set_item('key1','val1')\nassert s.get_item('key1') == 'val1'\ns.remove_item('key1')\nassert s.get_item('key1') is None\nassert s.get_item('nonexistent') is None\nprint('✓ All tests passed!')"
+  },
+  {
+    id:"c10", title:"Notification Payload Builder",
+    desc:"Write a function <code>build_notification(title, body, data=None)</code> that returns a dict with keys <b>'title'</b>, <b>'body'</b>, and <b>'data'</b> (defaulting to empty dict if not provided).",
+    example:"build_notification('Hi','You have a message',{'userId':1}) → {'title':'Hi','body':'You have a message','data':{'userId':1}}\nbuild_notification('Alert','Check in') → {'title':'Alert','body':'Check in','data':{}}",
+    starter:"def build_notification(title, body, data=None):\n    # Build notification payload\n    pass\n\nprint(build_notification('Hi','Message',{'id':1}))\nprint(build_notification('Alert','Check in'))",
+    testCode:"n = build_notification('Hi','Msg',{'id':1})\nassert n == {'title':'Hi','body':'Msg','data':{'id':1}}\nn2 = build_notification('A','B')\nassert n2 == {'title':'A','body':'B','data':{}}\nprint('✓ All tests passed!')"
+  },
+];
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let studiedTopics = JSON.parse(localStorage.getItem('rn-studied') || '[]');
+let currentTrack = 0;
+let quizQuestions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let codeIndex = 0;
+let activeCodeChallenges = [];
+let pyodide = null;
+let pyReady = false;
+
+/* THEME */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.querySelector('.theme-btn').textContent = isDark ? '🌙' : '☀️';
+}
+
+/* PANEL NAVIGATION */
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  const idx = ['study','mcq-select','code-select'].indexOf(name);
+  if(idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  if(name === 'mcq-select') populateTopicSelect();
+  updateCanvas(name);
+}
+
+/* STUDY */
+function countTotalTopics() {
+  let t = 0;
+  SYLLABUS.forEach(tr => tr.modules.forEach(m => t += m.topics.length));
+  return t;
+}
+function updateProgress() {
+  document.getElementById('studied-count').textContent = studiedTopics.length;
+  document.getElementById('total-topics').textContent = countTotalTopics();
+  localStorage.setItem('rn-studied', JSON.stringify(studiedTopics));
+}
+function showTrack(idx) {
+  currentTrack = idx;
+  document.querySelectorAll('.track-btn').forEach((b,i) => b.classList.toggle('active', i === idx));
+  renderModules();
+}
+function renderModules() {
+  const track = SYLLABUS[currentTrack];
+  const area = document.getElementById('modules-area');
+  area.innerHTML = '';
+  track.modules.forEach((mod, mi) => {
+    const card = document.createElement('div');
+    card.className = 'module-card animate-in';
+    card.style.animationDelay = (mi * 0.05) + 's';
+    const studied = mod.topics.filter(t => studiedTopics.includes(mod.id + '_' + t)).length;
+    card.innerHTML = `
+      <div class="module-header" onclick="toggleModule(this)">
+        <span class="module-num">MOD ${mi+1}</span>
+        <span class="module-title">${mod.title}</span>
+        <span class="module-progress">${studied}/${mod.topics.length}</span>
+        <span class="module-chevron">▼</span>
+      </div>
+      <div class="module-body">
+        <div class="topic-grid">
+          ${mod.topics.map(t => {
+            const key = mod.id + '_' + t;
+            const done = studiedTopics.includes(key);
+            return `<div class="topic-chip${done?' studied':''}" onclick="toggleTopic('${key.replace(/'/g,"\\'")}',this)">${done?'<span class="check">✓</span>':''}${t}</div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    area.appendChild(card);
+  });
+}
+function toggleModule(header) { header.parentElement.classList.toggle('open'); }
+function toggleTopic(key, el) {
+  const idx = studiedTopics.indexOf(key);
+  if(idx >= 0) {
+    studiedTopics.splice(idx, 1);
+    el.classList.remove('studied');
+    el.innerHTML = el.textContent.replace('✓','');
+  } else {
+    studiedTopics.push(key);
+    el.classList.add('studied');
+    el.innerHTML = '<span class="check">✓</span>' + el.textContent;
+  }
+  updateProgress();
+}
+
+/* MCQ QUIZ */
+function populateTopicSelect() {
+  const sel = document.getElementById('topic-select');
+  sel.innerHTML = '<option value="">— Pick a module —</option>';
+  SYLLABUS.forEach(tr => {
+    const og = document.createElement('optgroup');
+    og.label = tr.track;
+    tr.modules.forEach(mod => {
+      const opt = document.createElement('option');
+      opt.value = mod.id;
+      opt.textContent = mod.title;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+}
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+function startTopicQuiz() {
+  const sel = document.getElementById('topic-select').value;
+  if(!sel) { alert('Please select a module first!'); return; }
+  quizQuestions = shuffle(getModuleQuestions(sel)).slice(0, 15);
+  launchMCQ('Topic Quiz');
+}
+function startMixedQuiz() {
+  quizQuestions = shuffle(ALL_QUESTIONS).slice(0, 15);
+  launchMCQ('Mixed Exam');
+}
+function launchMCQ(title) {
+  currentQ = 0; score = 0;
+  showPanel('mcq');
+  document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+  renderQuestion(title);
+}
+function shuffleOptions(q) {
+  const correctText = q.opts[q.ans];
+  const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+  return { opts: shuffled, ans: shuffled.indexOf(correctText) };
+}
+function renderQuestion(title) {
+  const container = document.getElementById('quiz-container');
+  if(currentQ >= quizQuestions.length) { showMCQResults(); return; }
+  const raw = quizQuestions[currentQ];
+  const q = { ...raw, ...shuffleOptions(raw) };
+  answered = false;
+  const letters = ['A','B','C','D'];
+  container.innerHTML = `
+    <div class="quiz-header animate-in">
+      <div class="quiz-title">${title||'Quiz'}</div>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${(currentQ/quizQuestions.length)*100}%"></div></div>
+      <div class="q-counter">${currentQ+1} / ${quizQuestions.length}</div>
+      <div class="score-badge">Score: ${score}</div>
+    </div>
+    <div class="question-card animate-in" style="animation-delay:0.1s">
+      <div class="question-text">${q.q}</div>
+      <div class="options-grid">
+        ${q.opts.map((o,i)=>`
+          <button class="option-btn" onclick="selectOption(${i},${q.ans},'${title.replace(/'/g,"\\'")}')">
+            <span class="option-letter">${letters[i]}</span>${o}
+          </button>`).join('')}
+      </div>
+      <div class="explain-box" id="explain-box">${q.exp}</div>
+      <button class="next-btn" id="next-btn" onclick="nextQuestion('${title.replace(/'/g,"\\'")}')">
+        ${currentQ < quizQuestions.length-1 ? 'Next Question →' : 'See Results →'}
+      </button>
+    </div>`;
+}
+function selectOption(chosen, correct, title) {
+  if(answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.option-btn');
+  btns[correct].classList.add('correct');
+  if(chosen === correct) { score++; playSound('snd-correct'); }
+  else { btns[chosen].classList.add('wrong'); playSound('snd-wrong'); }
+  btns.forEach(b => b.disabled = true);
+  document.getElementById('explain-box').classList.add('show');
+  document.getElementById('next-btn').classList.add('show');
+}
+function nextQuestion(title) { currentQ++; renderQuestion(title); }
+function showMCQResults() {
+  const pct = Math.round((score/quizQuestions.length)*100);
+  const pass = pct >= 60;
+  if(pass) playSound('snd-win'); else playSound('snd-gameover');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-results').classList.add('active');
+  document.getElementById('results-card').innerHTML = `
+    <div style="font-size:52px">${pass?'⚛️':'📱'}</div>
+    <div class="results-score ${pass?'pass':'fail'}">${pct}%</div>
+    <div class="results-label">${score} / ${quizQuestions.length} correct</div>
+    <div style="font-size:12px;color:var(--text2)">${pass?'Great work! Your React Native knowledge is solid.':'Keep learning — review the modules and try again!'}</div>
+    <div class="results-actions">
+      <button class="start-quiz-btn" onclick="showPanel('mcq-select')">Try Again</button>
+      <button class="clear-btn" onclick="showPanel('study')">Back to Study</button>
+    </div>`;
+}
+
+/* SOUND (reuse same sound files if in same directory, else silent) */
+function playSound(id) {
+  try { const el = document.getElementById(id); if(el){el.currentTime=0;el.play().catch(()=>{});} } catch(e){}
+}
+
+/* CODE QUIZ */
+function startCodeQuiz() {
+  activeCodeChallenges = shuffle(CODE_CHALLENGES).slice(0, 10);
+  codeIndex = 0; score = 0;
+  showPanel('code');
+  document.querySelector('.nav-btn:nth-child(3)').classList.add('active');
+  renderCodeChallenge();
+}
+function renderCodeChallenge() {
+  const container = document.getElementById('code-container');
+  if(codeIndex >= activeCodeChallenges.length) { showCodeResults(); return; }
+  const ch = activeCodeChallenges[codeIndex];
+  const safeStarter = ch.starter.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  container.innerHTML = `
+    <div class="code-problem animate-in">
+      <div class="code-problem-num">Challenge ${codeIndex+1} of ${activeCodeChallenges.length}</div>
+      <div class="code-problem-title">${ch.title}</div>
+      <div class="code-problem-desc">${ch.desc}</div>
+      <div>
+        <div class="code-example-label">Example</div>
+        <div class="code-example">${ch.example}</div>
+      </div>
+      <div style="margin-top:auto;padding-top:16px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Progress</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${activeCodeChallenges.map((_,i)=>`<div style="width:20px;height:6px;border-radius:3px;background:${i<codeIndex?'var(--correct)':i===codeIndex?'var(--accent)':'var(--border2)'}"></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="code-editor-side animate-in" style="animation-delay:0.1s">
+      <div class="editor-wrapper">
+        <div class="editor-topbar">
+          <div class="editor-dot" style="background:#ff5f57"></div>
+          <div class="editor-dot" style="background:#ffbd2e"></div>
+          <div class="editor-dot" style="background:#28c840"></div>
+          <span style="margin-left:8px;font-family:var(--font-mono)">${ch.title.toLowerCase().replace(/ /g,'_')}.py</span>
+          <div class="pyodide-status">
+            <div class="status-dot ${pyReady?'ready':'loading'}" id="inline-dot"></div>
+            <span>${pyReady?'Python ready':'Loading…'}</span>
+          </div>
+        </div>
+        <textarea class="code-textarea" id="code-editor" spellcheck="false">${ch.starter}</textarea>
+      </div>
+      <div class="output-box" id="output-box">Output will appear here after running…</div>
+      <div class="code-actions">
+        <button class="run-btn" id="run-btn" onclick="runCode()" ${!pyReady?'disabled':''}>▶ Run & Test</button>
+        <button class="clear-btn" id="reset-btn" onclick="resetEditor()">Reset</button>
+        <div class="code-nav" style="margin-left:auto">
+          <button class="code-nav-btn" onclick="skipChallenge()">Skip →</button>
+        </div>
+      </div>
+    </div>`;
+}
+function resetEditor() {
+  const ch = activeCodeChallenges[codeIndex];
+  document.getElementById('code-editor').value = ch.starter;
+}
+async function runCode() {
+  if(!pyReady || !pyodide) { alert('Python runtime still loading…'); return; }
+  const btn = document.getElementById('run-btn');
+  const out = document.getElementById('output-box');
+  btn.disabled = true; btn.textContent = '⏳ Running…';
+  out.className = 'output-box'; out.textContent = 'Running…';
+  const userCode = document.getElementById('code-editor').value;
+  const ch = activeCodeChallenges[codeIndex];
+  const fullCode = userCode + '\n\n' + ch.testCode;
+  let output = '';
+  pyodide.setStdout({ batched: (s) => output += s + '\n' });
+  pyodide.setStderr({ batched: (s) => output += '❌ ' + s + '\n' });
+  try {
+    await pyodide.runPythonAsync(fullCode);
+    out.className = 'output-box pass';
+    out.textContent = output || '✓ Tests passed!';
+    playSound('snd-win');
+    score++;
+    setTimeout(() => { codeIndex++; renderCodeChallenge(); }, 1800);
+  } catch(e) {
+    out.className = 'output-box fail';
+    out.textContent = (output || '') + '\n❌ ' + e.message;
+    playSound('snd-wrong');
+  }
+  btn.disabled = false; btn.textContent = '▶ Run & Test';
+}
+function skipChallenge() { codeIndex++; renderCodeChallenge(); }
+function showCodeResults() {
+  const pct = Math.round((score/activeCodeChallenges.length)*100);
+  const pass = pct >= 60;
+  if(pass) playSound('snd-win'); else playSound('snd-gameover');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-results').classList.add('active');
+  document.getElementById('results-card').innerHTML = `
+    <div style="font-size:52px">${pass?'🚀':'🔧'}</div>
+    <div class="results-score ${pass?'pass':'fail'}">${pct}%</div>
+    <div class="results-label">${score} / ${activeCodeChallenges.length} solved</div>
+    <div style="font-size:12px;color:var(--text2)">${pass?'Excellent! You think like a React Native dev.':'Keep practising — you are getting there!'}</div>
+    <div class="results-actions">
+      <button class="start-quiz-btn" onclick="startCodeQuiz()">Try Again</button>
+      <button class="clear-btn" onclick="showPanel('study')">Back to Study</button>
+    </div>`;
+}
+
+/* PYODIDE */
+async function loadPyodide() {
+  try {
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/npm/pyodide@0.25.0/' });
+    pyReady = true;
+    document.getElementById('py-dot').className = 'status-dot ready';
+    document.getElementById('py-status').textContent = 'Python ready ✓';
+    setTimeout(() => { document.getElementById('pyodide-toast').style.display = 'none'; }, 2000);
+  } catch(e) {
+    document.getElementById('py-status').textContent = 'Python failed to load';
+  }
+}
+loadPyodide();
+
+/* THREE.JS BACKGROUND */
+const canvas = document.getElementById('bg-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+function makePhoneGrid() {
+  const scene = new THREE.Scene();
+  const count = 2000;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+  for(let i = 0; i < count; i++) {
+    pos[i*3] = (Math.random()-0.5)*22;
+    pos[i*3+1] = (Math.random()-0.5)*16;
+    pos[i*3+2] = (Math.random()-0.5)*8;
+    const c = new THREE.Color().setHSL(0.55+Math.random()*0.15, 0.9, 0.4+Math.random()*0.3);
+    col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col,3));
+  const mat = new THREE.PointsMaterial({size:0.05,vertexColors:true,transparent:true,opacity:0.8});
+  const pts = new THREE.Points(geo, mat);
+  scene.add(pts);
+  return { scene, update(t) { pts.rotation.y = t*0.03; pts.rotation.x = Math.sin(t*0.01)*0.2; } };
+}
+
+function makeAtomScene() {
+  const scene = new THREE.Scene();
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.15,16,16),
+    new THREE.MeshBasicMaterial({color:0x61dafb})
+  );
+  scene.add(core);
+  const orbits = [];
+  for(let i = 0; i < 3; i++) {
+    const curve = new THREE.EllipseCurve(0,0,2,1);
+    const pts = curve.getPoints(80);
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:0.3}));
+    line.rotation.x = (i/3)*Math.PI;
+    line.rotation.z = (i/3)*Math.PI*0.5;
+    scene.add(line);
+    const electron = new THREE.Mesh(
+      new THREE.SphereGeometry(0.06,8,8),
+      new THREE.MeshBasicMaterial({color:0x818cf8})
+    );
+    scene.add(electron);
+    orbits.push({electron, angle: (i/3)*Math.PI*2, rx:2, ry:1, rx_angle:(i/3)*Math.PI, rz_angle:(i/3)*Math.PI*0.5});
+  }
+  const particles = [];
+  const pgeo = new THREE.BufferGeometry();
+  const ppos = new Float32Array(600*3);
+  for(let i=0;i<600;i++){ppos[i*3]=(Math.random()-0.5)*20;ppos[i*3+1]=(Math.random()-0.5)*14;ppos[i*3+2]=(Math.random()-0.5)*6;}
+  pgeo.setAttribute('position',new THREE.BufferAttribute(ppos,3));
+  const ppts = new THREE.Points(pgeo, new THREE.PointsMaterial({color:0x38bdf8,size:0.03,transparent:true,opacity:0.4}));
+  scene.add(ppts);
+  return { scene, update(t) {
+    core.rotation.y = t*0.5;
+    orbits.forEach((o,i) => {
+      o.angle += 0.015 + i*0.005;
+      const x = Math.cos(o.angle)*o.rx;
+      const y = Math.sin(o.angle)*o.ry;
+      const rx = o.rx_angle, rz = o.rz_angle;
+      o.electron.position.set(
+        x*Math.cos(rz)-y*Math.sin(rx)*Math.sin(rz),
+        x*Math.sin(rz)+y*Math.sin(rx)*Math.cos(rz),
+        y*Math.cos(rx)
+      );
+    });
+    ppts.rotation.y = t*0.02;
+  }};
+}
+
+const scenes = {
+  study: makePhoneGrid(),
+  'mcq-select': makeAtomScene(),
+  'mcq': makeAtomScene(),
+  'code-select': makePhoneGrid(),
+  'code': makePhoneGrid(),
+  results: makeAtomScene(),
+};
+let currentScene = scenes.study;
+function updateCanvas(name) { currentScene = scenes[name] || scenes.study; }
+
+let clock = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  clock += 0.01;
+  if(currentScene) currentScene.update(clock);
+  renderer.render(currentScene.scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+/* INIT */
+updateProgress();
+renderModules();
+populateTopicSelect();
+
+/* Sound elements — optional, point to same sounds folder */
+</script>
+
+<!-- Optional: reuse sounds from parent dir or same dir -->
+<audio id="snd-correct" src="sounds/correct.wav" preload="auto"></audio>
+<audio id="snd-wrong" src="sounds/losetrumpet.wav" preload="auto"></audio>
+<audio id="snd-win" src="sounds/Win sound.wav" preload="auto"></audio>
+<audio id="snd-gameover" src="sounds/game_over.wav" preload="auto"></audio>
+</body>
+</html>
